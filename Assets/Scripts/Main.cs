@@ -8,7 +8,11 @@ public class Main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        MandelbrotMesh m = new MandelbrotMesh(0.02);
+        int width = 256, length = 256;
+        int[] z = new int[width*length];
+        for (int i = 0; i < width*length; i++)
+            z[i] = 1;
+        MeshGen m = new MeshGen(width, length, z);
         m.GenerateMesh();
     }
 
@@ -17,7 +21,6 @@ public class Main : MonoBehaviour
     {
         
     }
-
 
     private void MandelbrotCubes() {
         int result;
@@ -38,5 +41,34 @@ public class Main : MonoBehaviour
                 }
             }
         }
+    }
+}
+
+public static class MandelbrotGen
+{
+    private static int maxIterations = 150;
+
+    public static void SetMaxIterations(int maxIterationsIn) {
+        maxIterations = maxIterationsIn;
+    }
+
+
+    public static int Iterate(double xIn, double yIn) {
+        int output = 0;
+        double x = 0;
+        double y = 0;
+
+        for (int i = 0; i < maxIterations; i++) {
+            if (x*x + y*y >= 4) {
+                output = i;
+                break;
+            }
+
+            double tempX = x*x - y*y + xIn;
+            y = 2*x*y + yIn;
+            x = tempX;
+        }
+
+        return output;
     }
 }
