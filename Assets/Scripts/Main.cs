@@ -10,6 +10,7 @@ public class Main : MonoBehaviour
     {
         MandelbrotMesh m = new MandelbrotMesh(0.0005);
         m.GenerateMesh();
+        // MandelbrotGen.CreateMesh(500);
     }
 
     // Update is called once per frame
@@ -17,7 +18,6 @@ public class Main : MonoBehaviour
     {
         
     }
-
 
     private void MandelbrotCubes() {
         int result;
@@ -38,5 +38,58 @@ public class Main : MonoBehaviour
                 }
             }
         }
+    }
+}
+
+public static class MandelbrotGen
+{
+    private static int maxIterations = 150;
+
+    public static void SetMaxIterations(int maxIterationsIn) {
+        maxIterations = maxIterationsIn;
+    }
+
+
+    public static int Iterate(double xIn, double yIn) {
+        int output = 0;
+        double x = 0;
+        double y = 0;
+
+        for (int i = 0; i < maxIterations; i++) {
+            if (x*x + y*y >= 4) {
+                output = i;
+                break;
+            }
+
+            double tempX = x*x - y*y + xIn;
+            y = 2*x*y + yIn;
+            x = tempX;
+        }
+
+        return output;
+    }
+
+    /*
+        scale: larger number = larger and higher detail
+    */
+    public static void CreateMesh(int scale) {
+        int sideLength = (int)(4*scale+1);
+        int[] z = new int[sideLength*sideLength];
+
+        for (int y = 0; y < sideLength; y++) {
+            for (int x = 0; x < sideLength; x++) {
+                int index = x+(y*sideLength);
+                double mandelbrotX = -2.0+(double)x*(1.0/scale);
+                double mandelbrotY = -2.0+(double)y*(1.0/scale);
+
+                z[index] = MandelbrotGen.Iterate(mandelbrotX, mandelbrotY);
+
+                if (z[index] != 1)
+                    z[index] *= -1;
+            }
+        }
+
+        MeshGen gen = new MeshGen(sideLength, sideLength, z);
+        gen.GenerateMesh();
     }
 }
