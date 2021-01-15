@@ -8,14 +8,17 @@ public class MeshGen : MonoBehaviour
 {
     private int totalWidth, totalLength, chunkCount, chunkSideLength;
     private int[] z;
+    private float scale;
 
     /*
         Precondition: z.Length must be width*length
     */
+    // public MeshGen(int width, int length, int[] z, float scale) {
     public MeshGen(int width, int length, int[] z) {
         totalWidth = width;
         totalLength = length;
         this.z = z;
+        // this.scale = scale;
     }
 
     public void GenerateMesh() {
@@ -54,17 +57,16 @@ public class MeshGen : MonoBehaviour
 
         // initializes each chunk
         for (int i = 0; i < chunkCount; i++) {
-            // create the GameObject for that chunk
-            GameObject gameObject = GameObject.Instantiate(baseObject);
-            gameObject.name = "mesh" + i.ToString();
-
-            tIndex = 0;
-            GenCoords(i, gameObject);
+            GenCoords(i, baseObject);
         }
     }
 
-    private void GenCoords(int chunkIndex, GameObject gameObject) {
+    private void GenCoords(int chunkIndex, GameObject baseObject) {
         // INIT
+        GameObject gameObject = GameObject.Instantiate(baseObject);
+        gameObject.name = "mesh" + chunkIndex.ToString();
+
+        tIndex = 0;
         Vector3[] vertices;
         int[] triangles;
         int width = 254;
@@ -85,23 +87,14 @@ public class MeshGen : MonoBehaviour
 
         // WRITE COORDINATES
         for (int i = 0; i < vertices.Length; i++) {
-            int x = (i%width) + (int)(254*chunkX);
-            int y = (int)Math.Ceiling((double)(i/width)) + (int)(254*chunkY);
+            int x = i%width;
+            int y = (int)Math.Ceiling((double)(i/width));
             int zPlt = 0;
 
             // if the current vertex is within the given width and height, and
             // not the z=0 chunk extensions, otherwise defaults to 0
-            if (x < totalWidth && y < totalLength) {
-                int index = i;
-                if (y > 0) {
-                    int yMult = totalWidth;
-                    if (totalWidth <= 65535) {
-                        index = y*totalWidth + x;
-                    } else if ((totalWidth-65535*chunkX) <= 65535)
-                      index = x + (int)(y*(totalWidth-65535*chunkX));
-                    else
-                        index = x + (int)(y*65535);
-                }
+            if (x+(chunkX*254) < totalWidth && y+(chunkY*254) < totalLength) {
+                int index = ((y+chunkY*254)*totalWidth)+x+(chunkX*254);
                 zPlt = z[index];
             }
 
@@ -131,9 +124,9 @@ public class MeshGen : MonoBehaviour
             gameObject.AddComponent<MeshFilter>();
             meshFilter = gameObject.GetComponent<MeshFilter>();
         }
-
+            
         meshFilter.sharedMesh = mesh;
-        meshFilter.transform.Translate(chunkX, 0, chunkY);
+        meshFilter.transform.Translate(chunkX*253, 0, chunkY*253);
     }
 
     private int tIndex = 0;

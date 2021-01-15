@@ -8,7 +8,7 @@ public class Main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int[] temp = MandelbrotGen.CreateMesh(200);
+        MandelbrotGen.CreateMesh(500);
     }
 
     // Update is called once per frame
@@ -70,10 +70,9 @@ public static class MandelbrotGen
     /*
         scale: larger number = larger and higher detail
     */
-    public static int[] CreateMesh(int scale) {
+    public static void CreateMesh(int scale) {
         int sideLength = (int)(4*scale+1);
         int[] z = new int[sideLength*sideLength];
-        int[] o = new int[sideLength*sideLength];
 
         for (int y = 0; y < sideLength; y++) {
             for (int x = 0; x < sideLength; x++) {
@@ -85,14 +84,10 @@ public static class MandelbrotGen
 
                 if (z[index] != 1)
                     z[index] *= -1;
-
-                o[index] = z[index];
             }
         }
 
         MeshGen gen = new MeshGen(sideLength, sideLength, z);
         gen.GenerateMesh();
-
-        return o;
     }
 }
