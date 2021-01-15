@@ -10,7 +10,7 @@ public class Main : MonoBehaviour
     {
         MandelbrotMesh m = new MandelbrotMesh(0.0005);
         m.GenerateMesh();
-        // MandelbrotGen.CreateMesh(500);
+        // MultiMeshMandelbrotGen.CreateMesh(500);
     }
 
     // Update is called once per frame
@@ -41,7 +41,7 @@ public class Main : MonoBehaviour
     }
 }
 
-public static class MandelbrotGen
+public static class MultiMeshMandelbrotGen
 {
     private static int maxIterations = 150;
 
@@ -82,7 +82,7 @@ public static class MandelbrotGen
                 double mandelbrotX = -2.0+(double)x*(1.0/scale);
                 double mandelbrotY = -2.0+(double)y*(1.0/scale);
 
-                z[index] = MandelbrotGen.Iterate(mandelbrotX, mandelbrotY);
+                z[index] = MultiMeshMandelbrotGen.Iterate(mandelbrotX, mandelbrotY);
 
                 if (z[index] != 1)
                     z[index] *= -1;
