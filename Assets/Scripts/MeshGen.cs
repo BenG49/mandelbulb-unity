@@ -44,19 +44,19 @@ public class MeshGen : MonoBehaviour
         
         chunkSideLength = (int)Math.Sqrt(chunkCount);
 
+        GameObject baseObject = new GameObject();
+        // renderer
+        baseObject.AddComponent<MeshRenderer>();
+        baseObject.GetComponent<MeshRenderer>().sharedMaterial =
+            (Material)Resources.Load("MeshMaterial", typeof(Material));
+        // filter
+        baseObject.AddComponent<MeshFilter>();
+
         // initializes each chunk
         for (int i = 0; i < chunkCount; i++) {
             // create the GameObject for that chunk
-            GameObject gameObject = new GameObject();
+            GameObject gameObject = GameObject.Instantiate(baseObject);
             gameObject.name = "mesh" + i.ToString();
-
-            // renderer
-            gameObject.AddComponent<MeshRenderer>();
-            gameObject.GetComponent<MeshRenderer>().sharedMaterial =
-                (Material)Resources.Load("MeshMaterial", typeof(Material));
-
-            // filter
-            gameObject.AddComponent<MeshFilter>();
 
             tIndex = 0;
             GenCoords(i, gameObject);
@@ -70,9 +70,7 @@ public class MeshGen : MonoBehaviour
         int width = 254;
         int length = 254;
         int chunkX = (int)(chunkIndex%Math.Sqrt(chunkCount));
-        int chunkY = (int)Math.Ceiling((double)((chunkIndex+1)/chunkSideLength));
-        if (chunkY != 0)
-            chunkY -= 1;
+        int chunkY = (int)Math.Ceiling((double)((chunkIndex)/chunkSideLength));
 
         // if an edge chunk (first is x, second is y)
         if ((chunkIndex+1)%Math.Sqrt(chunkCount) == 0)
@@ -87,7 +85,6 @@ public class MeshGen : MonoBehaviour
 
         // WRITE COORDINATES
         for (int i = 0; i < vertices.Length; i++) {
-            // subtract/add offset!
             int x = (i%width) + (int)(254*chunkX);
             int y = (int)Math.Ceiling((double)(i/width)) + (int)(254*chunkY);
             int zPlt = 0;
@@ -98,10 +95,10 @@ public class MeshGen : MonoBehaviour
                 int index = i;
                 if (y > 0) {
                     int yMult = totalWidth;
-                    if (totalWidth <= 65535)
-                        index = totalWidth;
-                    else if((totalWidth-65535*chunkX) <= 65535)
-                        index = x + (int)(y*(totalWidth-65535*chunkX));
+                    if (totalWidth <= 65535) {
+                        index = y*totalWidth + x;
+                    } else if ((totalWidth-65535*chunkX) <= 65535)
+                      index = x + (int)(y*(totalWidth-65535*chunkX));
                     else
                         index = x + (int)(y*65535);
                 }
@@ -117,10 +114,10 @@ public class MeshGen : MonoBehaviour
             }
         }
 
-        writeMesh(vertices, triangles, gameObject);
+        writeMesh(vertices, triangles, gameObject, chunkX, chunkY);
     }
 
-    private void writeMesh(Vector3[] vertices, int[] triangles, GameObject gameObject) {
+    private void writeMesh(Vector3[] vertices, int[] triangles, GameObject gameObject, int chunkX, int chunkY) {
         MeshFilter meshFilter;
         Mesh mesh = new Mesh();
         mesh.vertices = vertices;
@@ -136,6 +133,7 @@ public class MeshGen : MonoBehaviour
         }
 
         meshFilter.sharedMesh = mesh;
+        meshFilter.transform.Translate(chunkX, 0, chunkY);
     }
 
     private int tIndex = 0;

@@ -8,12 +8,7 @@ public class Main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int width = 256, length = 256;
-        int[] z = new int[width*length];
-        for (int i = 0; i < width*length; i++)
-            z[i] = 1;
-        MeshGen m = new MeshGen(width, length, z);
-        m.GenerateMesh();
+        int[] temp = MandelbrotGen.CreateMesh(200);
     }
 
     // Update is called once per frame
@@ -70,5 +65,34 @@ public static class MandelbrotGen
         }
 
         return output;
+    }
+
+    /*
+        scale: larger number = larger and higher detail
+    */
+    public static int[] CreateMesh(int scale) {
+        int sideLength = (int)(4*scale+1);
+        int[] z = new int[sideLength*sideLength];
+        int[] o = new int[sideLength*sideLength];
+
+        for (int y = 0; y < sideLength; y++) {
+            for (int x = 0; x < sideLength; x++) {
+                int index = x+(y*sideLength);
+                double mandelbrotX = -2.0+(double)x*(1.0/scale);
+                double mandelbrotY = -2.0+(double)y*(1.0/scale);
+
+                z[index] = MandelbrotGen.Iterate(mandelbrotX, mandelbrotY);
+
+                if (z[index] != 1)
+                    z[index] *= -1;
+
+                o[index] = z[index];
+            }
+        }
+
+        MeshGen gen = new MeshGen(sideLength, sideLength, z);
+        gen.GenerateMesh();
+
+        return o;
     }
 }
