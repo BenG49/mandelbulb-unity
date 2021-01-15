@@ -8,7 +8,7 @@ public class Main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        MandelbrotMesh m = new MandelbrotMesh(0.02);
+        MandelbrotMesh m = new MandelbrotMesh(0.0005);
         m.GenerateMesh();
     }
 

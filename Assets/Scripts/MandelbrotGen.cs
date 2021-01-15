@@ -72,7 +72,7 @@ public class MandelbrotMesh
             int y = (int)(i/width);
             double pltX = -2 + (i%width)*interval;
             double pltY = -2 + (int)(i/width)*interval;
-            int z = -3;
+            float z = 0;
 
             if (Math.Sqrt(pltX*pltX+pltY*pltY) <= 2)
                 z = 2-MandelbrotGen.Iterate(pltX, pltY);
@@ -87,6 +87,7 @@ public class MandelbrotMesh
 
         Mesh mesh = new Mesh();
 
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
